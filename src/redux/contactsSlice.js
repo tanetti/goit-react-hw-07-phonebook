@@ -1,45 +1,36 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-import { nanoid } from 'nanoid';
-import { truncateInnerWhitespaces } from 'utils';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const contactsSlice = createSlice({
-  name: 'contacts',
-  initialState: { data: [] },
-  reducers: {
-    addContact: {
-      reducer(state, action) {
-        state.data.push(action.payload);
-      },
-      prepare(newContactData) {
-        return {
-          payload: {
-            id: nanoid(14),
-            name: truncateInnerWhitespaces(newContactData.name),
-            number: truncateInnerWhitespaces(newContactData.number),
-          },
-        };
-      },
-    },
-    removeContact(state, action) {
-      state.data = state.data.filter(
-        contact => contact.id !== action.payload.contactID
-      );
-    },
-  },
+export const contactsApi = createApi({
+  reducerPath: 'contacts',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://63580a82c26aac906f3a1f81.mockapi.io/api',
+  }),
+  tagTypes: ['Contacts'],
+  endpoints: builder => ({
+    getContacts: builder.query({
+      query: () => `/contacts`,
+      providesTags: ['Contacts'],
+    }),
+    addContact: builder.mutation({
+      query: contact => ({
+        url: `/contacts`,
+        method: 'POST',
+        body: contact,
+      }),
+      invalidatesTags: ['Contacts'],
+    }),
+    removeContact: builder.mutation({
+      query: id => ({
+        url: `/contacts/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Contacts'],
+    }),
+  }),
 });
 
-const persistConfig = {
-  key: 'phonebook',
-  storage,
-};
-
-export const persistedContactsReducer = persistReducer(
-  persistConfig,
-  contactsSlice.reducer
-);
-
-export const { addContact, removeContact } = contactsSlice.actions;
-
-export const getContactsData = state => state.contacts.data;
+export const {
+  useGetContactsQuery,
+  useAddContactMutation,
+  useRemoveContactMutation,
+} = contactsApi;

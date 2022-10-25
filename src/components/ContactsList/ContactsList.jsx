@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { sortContacts, normalizeFilterValue, normalizeNumber } from 'utils';
-import { getContactsData } from 'redux/contactsSlice';
+import { useGetContactsQuery } from 'redux/contactsSlice';
 import { getFilterValue } from 'redux/filterSlice';
 import { theme } from 'constants/theme';
 import { Contact } from './Contact/Contact';
@@ -21,7 +21,7 @@ import {
 } from './ContactsList.styled';
 
 export const ContactsList = () => {
-  const contacts = useSelector(getContactsData);
+  const { data: contacts } = useGetContactsQuery();
   const filter = useSelector(getFilterValue);
 
   const [sortField, setSortField] = useState('name');
@@ -30,24 +30,25 @@ export const ContactsList = () => {
     number: true,
   });
 
-  const prepareFilteredContacts = () => {
+  const prepareFilteredContacts = contacts => {
     const normalizedFilterValue = normalizeFilterValue(filter);
     const prepearedContacts = [];
 
-    const contactsData = [...contacts];
+    const contactsData = contacts ? [...contacts] : null;
 
-    contactsData
-      .sort(sortContacts(sortField, isSortOrderASC[sortField]))
-      .forEach(contact => {
-        const normalizedName = contact.name.toLowerCase();
-        const normalizedNumber = normalizeNumber(contact.number);
+    contactsData &&
+      contactsData
+        .sort(sortContacts(sortField, isSortOrderASC[sortField]))
+        .forEach(contact => {
+          const normalizedName = contact.name.toLowerCase();
+          const normalizedNumber = normalizeNumber(contact.number);
 
-        if (
-          normalizedName.includes(normalizedFilterValue) ||
-          normalizedNumber.includes(normalizedFilterValue)
-        )
-          prepearedContacts.push(contact);
-      });
+          if (
+            normalizedName.includes(normalizedFilterValue) ||
+            normalizedNumber.includes(normalizedFilterValue)
+          )
+            prepearedContacts.push(contact);
+        });
 
     return prepearedContacts;
   };
@@ -61,7 +62,7 @@ export const ContactsList = () => {
     }));
   };
 
-  const preparedContacts = prepareFilteredContacts();
+  const preparedContacts = prepareFilteredContacts(contacts);
 
   const sortButtonIconSize = theme.sizes.sortButtonIcon;
   const noResultIconSize = theme.sizes.noResultIcon;

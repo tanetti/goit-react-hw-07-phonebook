@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import { Notify } from 'notiflix';
-import { useDispatch } from 'react-redux';
-import { removeContact } from 'redux/contactsSlice';
+// import { useDispatch } from 'react-redux';
+import { useRemoveContactMutation } from 'redux/contactsSlice';
 import { SafeButton, UnsafeButton } from 'components/Shared';
-import { theme, transitionDuration } from 'constants/theme';
+import { theme } from 'constants/theme';
 import {
   DelettingCaptionContainer,
   DelettingContact,
@@ -12,16 +12,16 @@ import {
 } from './DeleteContactPrompt.styled';
 
 export const DeleteContactPrompt = ({ id, name, onClose }) => {
-  const dispatch = useDispatch();
+  const [removeContact] = useRemoveContactMutation();
 
-  const onDeleteButtonClick = () => {
-    onClose();
-
-    setTimeout(() => {
-      dispatch(removeContact({ contactID: id }));
-
+  const onDeleteButtonClick = async id => {
+    try {
+      await removeContact(id);
       Notify.success(`Contact was successfully deleted`);
-    }, transitionDuration);
+      onClose();
+    } catch (error) {
+      Notify.failure(`Something went wrong`);
+    }
   };
 
   return (
@@ -31,7 +31,7 @@ export const DeleteContactPrompt = ({ id, name, onClose }) => {
         <DelettingContact>{name}</DelettingContact>
       </DelettingCaptionContainer>
       <ButtonContainer>
-        <UnsafeButton type="button" onClick={onDeleteButtonClick}>
+        <UnsafeButton type="button" onClick={() => onDeleteButtonClick(id)}>
           Delete
         </UnsafeButton>
         <SafeButton type="button" onClick={onClose}>

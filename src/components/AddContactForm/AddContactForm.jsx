@@ -1,6 +1,8 @@
 import { Formik } from 'formik';
-import { useDispatch, useSelector } from 'react-redux';
-import { addContact, getContactsData } from 'redux/contactsSlice';
+import {
+  useGetContactsQuery,
+  useAddContactMutation,
+} from 'redux/contactsSlice';
 import { Notify } from 'notiflix';
 import { createNewValidationSchema } from 'utils';
 import { theme } from 'constants/theme';
@@ -17,17 +19,19 @@ import {
 } from './AddContactForm.styled';
 
 export const AddContactForm = ({ onClose }) => {
-  const contacts = useSelector(getContactsData);
-  const dispatch = useDispatch();
+  const { data: contacts } = useGetContactsQuery();
+  const [addContact, { isLoading }] = useAddContactMutation();
 
   const validationSchema = createNewValidationSchema(contacts);
 
-  const onNewContactSubmit = newContactData => {
-    dispatch(addContact(newContactData));
-
-    Notify.success(`New contact was successfully added`);
-
-    onClose();
+  const onNewContactSubmit = async newContactData => {
+    try {
+      await addContact(newContactData);
+      Notify.success(`New contact was successfully added`);
+      onClose();
+    } catch (error) {
+      Notify.failure(`Something went wrong`);
+    }
   };
 
   return (
@@ -70,13 +74,17 @@ export const AddContactForm = ({ onClose }) => {
             </ErrorMessageField>
           </FormFieldContainer>
           <ButtonContainer>
-            <UnsafeButton type="button" onClick={onClose}>
+            <UnsafeButton type="button" disabled={isLoading} onClick={onClose}>
               Cancel
             </UnsafeButton>
             <SafeButton
               type="submit"
               disabled={
-                !values.name || !values.number || errors.name || errors.number
+                !values.name ||
+                !values.number ||
+                errors.name ||
+                errors.number ||
+                isLoading
               }
             >
               Add contact

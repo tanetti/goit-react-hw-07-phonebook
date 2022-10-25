@@ -60,6 +60,20 @@ export const UnsafeButton = styled.button`
   transition: ${({ theme }) => theme.transitions.color},
     ${({ theme }) => theme.transitions.borderColor};
 
+  &:disabled {
+    color: ${({ theme }) => theme.colors.whiteText};
+    background-color: ${({ theme }) => theme.colors.darkBG};
+
+    border: ${({ theme }) => theme.borders.accentTransparent};
+
+    &:hover {
+      color: ${({ theme }) => theme.colors.whiteText};
+      background-color: ${({ theme }) => theme.colors.darkBG};
+
+      border: ${({ theme }) => theme.borders.accentTransparent};
+    }
+  }
+
   &:hover,
   &:focus {
     color: ${({ theme }) => theme.colors.error};
