@@ -3,6 +3,7 @@ import { Notify } from 'notiflix';
 // import { useDispatch } from 'react-redux';
 import { useRemoveContactMutation } from 'redux/contactsSlice';
 import { SafeButton, UnsafeButton } from 'components/Shared';
+import { Loader } from 'components/Shared';
 import { theme } from 'constants/theme';
 import {
   DelettingCaptionContainer,
@@ -12,7 +13,7 @@ import {
 } from './DeleteContactPrompt.styled';
 
 export const DeleteContactPrompt = ({ id, name, onClose }) => {
-  const [removeContact] = useRemoveContactMutation();
+  const [removeContact, { isLoading }] = useRemoveContactMutation();
 
   const onDeleteButtonClick = async id => {
     try {
@@ -31,10 +32,15 @@ export const DeleteContactPrompt = ({ id, name, onClose }) => {
         <DelettingContact>{name}</DelettingContact>
       </DelettingCaptionContainer>
       <ButtonContainer>
-        <UnsafeButton type="button" onClick={() => onDeleteButtonClick(id)}>
+        <Loader shouldShown={isLoading} position="absolute" />
+        <UnsafeButton
+          type="button"
+          disabled={isLoading}
+          onClick={() => onDeleteButtonClick(id)}
+        >
           Delete
         </UnsafeButton>
-        <SafeButton type="button" onClick={onClose}>
+        <SafeButton type="button" disabled={isLoading} onClick={onClose}>
           Cancel
         </SafeButton>
       </ButtonContainer>

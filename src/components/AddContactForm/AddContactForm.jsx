@@ -6,6 +6,7 @@ import {
 import { Notify } from 'notiflix';
 import { createNewValidationSchema } from 'utils';
 import { theme } from 'constants/theme';
+import { Loader } from 'components/Shared';
 import { SafeButton, UnsafeButton } from 'components/Shared';
 import {
   StyledForm,
@@ -74,6 +75,7 @@ export const AddContactForm = ({ onClose }) => {
             </ErrorMessageField>
           </FormFieldContainer>
           <ButtonContainer>
+            <Loader shouldShown={isLoading} position="absolute" />
             <UnsafeButton type="button" disabled={isLoading} onClick={onClose}>
               Cancel
             </UnsafeButton>

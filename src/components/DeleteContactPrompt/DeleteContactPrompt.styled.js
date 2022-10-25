@@ -25,6 +25,8 @@ export const DelettingContactIcon = styled(BiUserX)`
 `;
 
 export const ButtonContainer = styled.div`
+  position: relative;
+
   display: flex;
   justify-content: space-between;
   align-items: center;

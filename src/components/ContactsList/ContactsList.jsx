@@ -19,9 +19,10 @@ import {
   CenteredSpan,
   NoResultsIcon,
 } from './ContactsList.styled';
+import { Loader } from 'components/Shared';
 
 export const ContactsList = () => {
-  const { data: contacts } = useGetContactsQuery();
+  const { data: contacts, isLoading } = useGetContactsQuery();
   const filter = useSelector(getFilterValue);
 
   const [sortField, setSortField] = useState('name');
@@ -34,7 +35,7 @@ export const ContactsList = () => {
     const normalizedFilterValue = normalizeFilterValue(filter);
     const prepearedContacts = [];
 
-    const contactsData = contacts ? [...contacts] : null;
+    const contactsData = !isLoading ? [...contacts] : null;
 
     contactsData &&
       contactsData
@@ -141,8 +142,14 @@ export const ContactsList = () => {
             <tr>
               <TableDataCellEmpty colSpan={4}>
                 <CenteredSpan>
-                  Phonebook is empty
-                  <NoResultsIcon size={noResultIconSize} />
+                  {isLoading ? (
+                    <Loader shouldShown={true} />
+                  ) : (
+                    <>
+                      Phonebook is empty
+                      <NoResultsIcon size={noResultIconSize} />
+                    </>
+                  )}
                 </CenteredSpan>
               </TableDataCellEmpty>
             </tr>
