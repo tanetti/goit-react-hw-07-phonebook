@@ -22,7 +22,7 @@ import {
 import { Loader } from 'components/Shared';
 
 export const ContactsList = () => {
-  const { data: contacts, isLoading } = useGetContactsQuery();
+  const { data: contacts, isLoading, isSuccess } = useGetContactsQuery();
   const filter = useSelector(getFilterValue);
 
   const [sortField, setSortField] = useState('name');
@@ -35,7 +35,7 @@ export const ContactsList = () => {
     const normalizedFilterValue = normalizeFilterValue(filter);
     const prepearedContacts = [];
 
-    const contactsData = !isLoading ? [...contacts] : null;
+    const contactsData = isSuccess ? [...contacts] : null;
 
     contactsData &&
       contactsData
